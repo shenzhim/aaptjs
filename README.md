@@ -15,7 +15,7 @@ Using a callback:
 ```js
 const aaptjs = require('aaptjs');
 
-aaptjs.list('-v', '/path/to/your/ExampleApp.apk', (err, data) => {
+aaptjs.list('/path/to/your/ExampleApp.apk', (err, data) => {
   if (err) {
     // something went wrong 
   } else {
@@ -29,7 +29,7 @@ Using a promise:
 ```js
 const aaptjs = require('aaptjs');
 
-aaptjs.list('-v','/path/to/your/ExampleApp.apk')
+aaptjs.list('/path/to/your/ExampleApp.apk')
   .then (data => {
     console.log(data)
   })

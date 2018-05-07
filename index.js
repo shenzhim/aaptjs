@@ -37,7 +37,6 @@ function remove(apkfilePath, files, callback) {
 		files = [files]
 	}
 	const removeFiles = files.join(' ')
-
 	return promistify(`${aapt} r ${apkfilePath} ${removeFiles}`, callback);
 }
 
