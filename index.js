@@ -5,10 +5,10 @@ const os = require('os');
 const path = require('path');
 const aapt = path.join(__dirname, 'bin', os.platform(), 'aapt');
 
-exports function list(modifiers, apkfilePath, callback) {
+function promistify(cmd, callback) {
 	callback = callback || function () {};
 	return new Promise((resolve, reject) => {
-		exec(`${aapt} l ${modifiers} ${apkfilePath}`, (code, stdout, stderr) => {
+		exec(cmd, (code, stdout, stderr) => {
       if (code !== 0) {
         reject(stderr);
         callback(stderr, null);
@@ -17,125 +17,61 @@ exports function list(modifiers, apkfilePath, callback) {
       	callback(null, stdout);
       }
 		})
-	}
+	});
 }
 
-exports function dump(modifiers, what, apkfilePath, callback) {
-	callback = callback || function () {};
-	return new Promise((resolve, reject) => {
-		exec(`${aapt} d ${modifiers} ${what} ${apkfilePath}`, (code, stdout, stderr) => {
-      if (code !== 0) {
-        reject(stderr);
-        callback(stderr, null);
-      } else {
-      	resolve(stdout);
-				callback(null, stdout);
-      }
-		})
-	}
+function list(apkfilePath, callback) {
+	return promistify(`${aapt} l ${apkfilePath}`, callback);
 }
 
-exports function package(command, callback) {
-	callback = callback || function () {};
-	return new Promise((resolve, reject) => {
-		exec(`${aapt} p ${command}`, (code, stdout, stderr) => {
-      if (code !== 0) {
-        reject(stderr);
-        callback(stderr, null);
-      } else {
-      	resolve(stdout);
-      	callback(null, stdout);
-      }
-		})
-	}
+function dump(what, apkfilePath, callback) {
+	return promistify(`${aapt} d ${what} ${apkfilePath}`, callback);
 }
 
-exports function remove(modifiers, apkfilePath, files, callback) {
-	callback = callback || function () {};
+function packageCmd(command, callback) {
+	return promistify(`${aapt} p ${command}`, callback);
+}
+
+function remove(apkfilePath, files, callback) {
 	if (!Array.isArray(files)) {
 		files = [files]
 	}
 	const removeFiles = files.join(' ')
 
-	return new Promise((resolve, reject) => {
-		exec(`${aapt} r ${modifiers} ${apkfilePath} ${removeFiles}`, (code, stdout, stderr) => {
-      if (code !== 0) {
-        reject(stderr);
-        callback(stderr, null);
-      } else {
-      	resolve(stdout);
-      	callback(null, stdout);
-      }
-		})
-	}
+	return promistify(`${aapt} r ${apkfilePath} ${removeFiles}`, callback);
 }
 
-exports function add(modifiers, apkfilePath, files, callback) {
-	callback = callback || function () {};
+function add(apkfilePath, files, callback) {
 	if (!Array.isArray(files)) {
 		files = [files]
 	}
 	const addFiles = files.join(' ')
-
-	return new Promise((resolve, reject) => {
-		exec(`${aapt} a ${modifiers} ${apkfilePath} ${addFiles}`, (code, stdout, stderr) => {
-      if (code !== 0) {
-        reject(stderr);
-        callback(stderr, null);
-      } else {
-      	resolve(stdout);
-      	callback(null, stdout);
-      }
-		})
-	}
+	return promistify(`${aapt} a ${apkfilePath} ${addFiles}`, callback);
 }
 
-exports function crunch(modifiers, resource, outputFolder, callback) {
-	callback = callback || function () {};
+function crunch(resource, outputFolder, callback) {
 	if (!Array.isArray(resource)) {
 		resource = [resource]
 	}
 	const resourceSources = resource.join(' ')
-
-	return new Promise((resolve, reject) => {
-		exec(`${aapt} c ${modifiers} -S ${resourceSources} -C ${outputFolder}`, (code, stdout, stderr) => {
-      if (code !== 0) {
-        reject(stderr);
-        callback(stderr, null);
-      } else {
-      	resolve(stdout);
-      	callback(null, stdout);
-      }
-		})
-	}
+	return promistify(`${aapt} c -S ${resourceSources} -C ${outputFolder}`, callback);
 }
 
-exports function singleCrunch(modifiers, inputFile, outputfile, callback) {
-	callback = callback || function () {};
-	return new Promise((resolve, reject) => {
-		exec(`${aapt} s ${modifiers} -i ${inputFile} -o ${outputfile}`, (code, stdout, stderr) => {
-      if (code !== 0) {
-        reject(stderr);
-        callback(stderr, null);
-      } else {
-      	resolve(stdout);
-      	callback(null, stdout);
-      }
-		})
-	}
+function singleCrunch(inputFile, outputfile, callback) {
+	return promistify(`${aapt} s -i ${inputFile} -o ${outputfile}`, callback);
 }
 
-exports function version(callback) {
-	callback = callback || function () {};
-	return new Promise((resolve, reject) => {
-		exec(`${aapt} v`, (code, stdout, stderr) => {
-      if (code !== 0) {
-        reject(stderr);
-        callback(stderr, null);
-      } else {
-      	resolve(stdout);
-      	callback(null, stdout);
-      }
-		})
-	}
+function version(callback) {
+	return promistify(`${aapt} v`, callback);
+}
+
+module.exports = {
+	list: list,
+	dump: dump,
+	packageCmd: packageCmd,
+	remove: remove,
+	add: add,
+	crunch: crunch,
+	singleCrunch: singleCrunch,
+	version: version
 }
