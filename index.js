@@ -1,9 +1,16 @@
 'use strict';
 
 require('shelljs/global');
+const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const aapt = path.join(__dirname, 'bin', os.platform(), 'aapt');
+
+const platform = os.platform();
+const aapt = path.join(__dirname, 'bin', platform , 'aapt');
+
+if (platform === 'linux') {
+	fs.chmodSync(aapt, '777')	
+}
 
 function promistify(cmd, callback) {
 	callback = callback || function () {};
