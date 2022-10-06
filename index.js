@@ -1,6 +1,6 @@
 'use strict';
 
-require('shelljs/global');
+const shelljs = require('shelljs');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -15,7 +15,7 @@ if (platform === 'linux') {
 function promistify(cmd, callback) {
 	callback = callback || function () {};
 	return new Promise((resolve, reject) => {
-		exec(cmd, (code, stdout, stderr) => {
+		shelljs.exec(cmd, (code, stdout, stderr) => {
       if (code !== 0) {
         reject(stderr);
         callback(stderr, null);
